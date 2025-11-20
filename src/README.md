@@ -8,6 +8,7 @@ A super simple website application that allows students to view and sign up for 
 - Sign up for activities
 - Filter activities by category, day, time, and difficulty level
 - Activities can have optional difficulty levels (Beginner, Intermediate, Advanced)
+- Share activities with friends via social media (Facebook, Twitter) or email
 
 ## Development Guide
 

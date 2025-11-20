@@ -26,6 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeLoginModal = document.querySelector(".close-login-modal");
   const loginMessage = document.getElementById("login-message");
 
+  // Dark mode elements
+  const darkModeToggle = document.getElementById("dark-mode-toggle");
+  const themeIcon = document.getElementById("theme-icon");
+
   // Activity categories with corresponding colors
   const activityTypes = {
     sports: { label: "Sports", color: "#e8f5e9", textColor: "#2e7d32" },
@@ -189,6 +193,35 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.add("not-authenticated");
     }
   }
+
+  // Dark mode functionality
+  function initDarkMode() {
+    // Check if user has a dark mode preference saved
+    const savedDarkMode = localStorage.getItem("darkMode");
+    
+    if (savedDarkMode === "enabled") {
+      document.body.classList.add("dark-mode");
+      themeIcon.textContent = "☀️";
+    } else {
+      themeIcon.textContent = "🌙";
+    }
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    
+    // Update the icon
+    if (document.body.classList.contains("dark-mode")) {
+      themeIcon.textContent = "☀️";
+      localStorage.setItem("darkMode", "enabled");
+    } else {
+      themeIcon.textContent = "🌙";
+      localStorage.setItem("darkMode", "disabled");
+    }
+  }
+
+  // Event listener for dark mode toggle
+  darkModeToggle.addEventListener("click", toggleDarkMode);
 
   // Login function
   async function login(username, password) {
@@ -565,6 +598,25 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
+    // Create share buttons
+    const shareButtons = `
+      <div class="share-buttons">
+        <span class="share-label">Share:</span>
+        <button class="share-button share-facebook tooltip" data-activity="${name}" data-platform="facebook" title="Share on Facebook">
+          <span class="share-icon">📘</span>
+          <span class="tooltip-text">Share on Facebook</span>
+        </button>
+        <button class="share-button share-twitter tooltip" data-activity="${name}" data-platform="twitter" title="Share on Twitter">
+          <span class="share-icon">🐦</span>
+          <span class="tooltip-text">Share on Twitter</span>
+        </button>
+        <button class="share-button share-email tooltip" data-activity="${name}" data-platform="email" title="Share via Email">
+          <span class="share-icon">📧</span>
+          <span class="tooltip-text">Share via Email</span>
+        </button>
+      </div>
+    `;
+
     activityCard.innerHTML = `
       ${tagHtml}
       ${difficultyBadge}
@@ -575,6 +627,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="tooltip-text">Regular meetings at this time throughout the semester</span>
       </p>
       ${capacityIndicator}
+      ${shareButtons}
       <div class="participants-list">
         <h5>Current Participants:</h5>
         <ul>
@@ -634,7 +687,48 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Add click handlers for share buttons
+    const shareButtonElements = activityCard.querySelectorAll(".share-button");
+    shareButtonElements.forEach((button) => {
+      button.addEventListener("click", () => {
+        handleShare(button.dataset.activity, button.dataset.platform);
+      });
+    });
+
     activitiesList.appendChild(activityCard);
+  }
+
+  // Handle social sharing
+  function handleShare(activityName, platform) {
+    const activity = allActivities[activityName];
+    if (!activity) return;
+
+    const activityUrl = window.location.origin + window.location.pathname;
+    const formattedSchedule = formatSchedule(activity);
+    const shareText = `Check out ${activityName} at Mergington High School! ${activity.description} Schedule: ${formattedSchedule}`;
+    const shareUrl = activityUrl;
+
+    switch (platform) {
+      case "facebook":
+        window.open(
+          `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
+          "_blank",
+          "width=600,height=400"
+        );
+        break;
+      case "twitter":
+        window.open(
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+          "_blank",
+          "width=600,height=400"
+        );
+        break;
+      case "email":
+        const emailSubject = `Check out ${activityName} at Mergington High School`;
+        const emailBody = `${shareText}\n\nLearn more: ${shareUrl}`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+        break;
+    }
   }
 
   // Event listeners for search and filter
@@ -922,6 +1016,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Initialize app
+  initDarkMode();
   checkAuthentication();
   initializeFilters();
   fetchActivities();
