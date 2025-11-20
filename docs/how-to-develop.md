@@ -62,6 +62,7 @@ These dependencies will be installed when you run `pip install -r src/requiremen
 | Method | Endpoint                                                          | Description                                                         |
 | ------ | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
 | GET    | `/activities`                                                     | Get all activities with their details and current participant count |
+| GET    | `/activities?difficulty={level}`                                  | Filter activities by difficulty level (Beginner, Intermediate, Advanced, or 'all' for no difficulty) |
 | POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Sign up for an activity                                             |
 
 > [!IMPORTANT]
